@@ -1,13 +1,15 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
+app.use(bodyParser.urlencoded({extended: false}));
 var reddit = require('./reddit.js');
 
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
-  user     : 'root', // CHANGE THIS :)
-  password : 'Sayuri97',
+  user     : 'dysupes', // CHANGE THIS :)
+  password : '',
   database: 'reddit'
 });
 
@@ -19,7 +21,7 @@ app.get('/hello', function (req, res) {
 
 app.get('/hello', function (req,res){
 
-	var name =req.query.name
+	var name = req.query.name;
 
 	res.send(`<h1> Hello ${name}!</h1>`);
 
@@ -90,8 +92,35 @@ app.get('/posts', function(request, response){
       response.send(html);
 
   })
+});
 
-})
+app.get('/createContent', function(request, response){
+  var htmlForm = `
+  <form action="/createContent" method="POST"> <!-- what is this method="POST" thing? you should know, or ask me :) -->
+    <div>
+      <input type="text" name="url" placeholder="Enter a URL to content">
+    </div>
+    <div>
+      <input type="text" name="title" placeholder="Enter the title of your content">
+    </div>
+    <button type="submit">Create!</button>
+  </form>
+  `;
+
+
+  response.send(htmlForm);
+});
+
+app.post('/createContent', function(request, response){
+  console.log(request.body);
+  redditAPI.createPost({
+    title: request.body.title,
+    url: request.body.url,
+    userId: 1
+  }, function (err, post){
+    res.send(post);
+  });
+});
 
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
